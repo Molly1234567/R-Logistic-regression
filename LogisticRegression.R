@@ -9,11 +9,13 @@ data=na.omit(dataDublin)
 data$price=as.numeric(gsub('[,€]', '', data$price))
 data$area=as.numeric(gsub('[ac,m²]','',data$area))
 data$bed=as.numeric(gsub('[Bed]','',data$bed))
-#apartment type is 1, house type is 0
+
+#Y should 0-1.So change apartment type is 1, house type is 0
 data$type=factor(data$type,levels = c("Apartment","Bungalow","Detached","Duplex","End of Terrace",
                                       "Semi-D","Terrace","Townhouse"),
                 labels=c("1","0","0","1","0","0","0","1"))
-#
+
+#change district to numeric, needs to convert 6W to 66
 data$district=as.numeric(gsub('[W]','6',data$district))
 
 View(data)
@@ -37,7 +39,9 @@ summary(model)
 modeldata=glm(type ~ district +area + bed + latitude + longitude + price
               ,data=data_train,family = "binomial")
 summary(modeldata)
+
 coef(modeldata)
+
 #Y=1.005762e+00*1 + 9.974900e-01*2 + 1.082732e+01*3 + 5.242799e-01*4 + 6.687032e-01*5 + 1.000000e+00*6 
 exp(coef(modeldata))
 
@@ -51,6 +55,7 @@ plot(modelroc, print.auc=TRUE, auc.polygon=TRUE, grid=c(0.1, 0.2),
      grid.col=c("green", "red"), max.auc.polygon=TRUE,
      auc.polygon.col="skyblue", print.thres=TRUE)
 
+#verify
 newdata=data.frame(district=8,
                    area=33,
                    bed=1,
